@@ -6,3 +6,7 @@ This script is witten by **Gokulakrishnan V** on 06-Sep-2023
 > ## Programs setup using this script
 > - Webmin, Virtualmin
 > -
+
+
+> Run the following
+    _ wget https://raw.githubusercontent.com/GokulakrishnanV/server_setup/main/server_setup.sh _

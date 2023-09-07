@@ -1,5 +1,14 @@
 #!/bin/bash
 
+cat <<"EOF"
+                                             _____      __            
+                                            / ___/___  / /___  ______ 
+                                            \__ \/ _ \/ __/ / / / __ \
+                                           ___/ /  __/ /_/ /_/ / /_/ /
+                                          /____/\___/\__/\__,_/ .___/ 
+                                                            /_/      
+EOF 
+
 # Update the system
 echo "Running this script requires root privileges"
 echo ""
@@ -20,12 +29,14 @@ read -p "Do you want to change the hostname? Enter 'y' to continue: " consent
 if [ "$consent" = "y" ]; then
     read -p "Enter your hostname (Eg: nutz): " new_hostname
     read -p "Enter your domain name (Eg: nutz.in): " domain_name
-    sudo -S echo "$new_hostname" > /etc/hostname
+    echo "$new_hostname" | sudo tee /etc/hostname
     echo "Your hostname has been modified successfully."
     echo "Your current hostname is $(cat /etc/hostname)"
     echo ""
     echo "Modifying your hosts file..."
-    sudo -S echo "127.0.1.1 $domain_name $new_hostname" >> /etc/hosts
+    echo "127.0.1.1 $domain_name $new_hostname" | sudo tee /tmp/hosts.tmp
+    sudo cat /etc/hosts >> /tmp/hosts.tmp
+    sudo mv /tmp/hosts.tmp /etc/hosts
     echo "Your hosts file has been changed successfully"
     echo ""
 else
