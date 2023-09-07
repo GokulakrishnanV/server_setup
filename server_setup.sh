@@ -13,16 +13,18 @@ echo "Running this script requires root privileges"
 echo ""
 read -p "Enter your root password: " password
 echo ""
-echo "Updating the system"
+echo "============================ Updating the system ============================"
 echo ""
 sudo -S apt update
 sudo -S apt-get dist-upgrade -y
+echo ""
+echo "============================ System Update Complete ========================="
 echo ""
 
 # Changing the Hostname and FQDN (Fully Qualified Domain Name)
 if [ ! -f "script_state.txt" ]; then
     step=1
-    echo "Changing your hostname & Fully Qualified Domain Name"
+    echo "=========================== Changing your hostname & Fully Qualified Domain Name ================================"
     echo ""
     echo "Your current hostname is: $(hostname -f)"
     echo ""
@@ -39,7 +41,7 @@ if [ ! -f "script_state.txt" ]; then
         echo "Saving script state..."
         echo "step=$step" >"script_state.txt"
         sudo reboot
-        echo "Your hosts file has been changed successfully"
+        echo "=============================== Your hosts file has been changed successfully ====================================="
         echo ""
     else
         echo "Hostname remains unchanged"
@@ -47,16 +49,19 @@ if [ ! -f "script_state.txt" ]; then
 fi
 
 # Webmin & Virtualmin setup
-echo "Virtualmin Setup"
+echo "========================================== Virtualmin Setup ========================================="
 echo ""
 echo "Downloading Virtualmin ..."
 wget https://software.virtualmin.com/gpl/scripts/install.sh
 echo "Installing Virtualmin ..."
 echo "y" | sudo /bin/sh ./install.sh
-echo "Virtualmin setup complete. Go to 'https://$domain_name:10000' to complete the post-installation wizard"
+# echo "Virtualmin setup complete. Go to 'https://$domain_name:10000' to complete the post-installation wizard"
+echo ""
+echo "========================================== Virutlamin Setup Completed ==============================================="
 echo ""
 
 # Node & NPM Setup using NVM
+echo "========================================= NVM, Node.js and NPM Setup ==============================================="
 read -p "Do you want to install Node.js and NPM? We will use NVM to set these up (Enter 'y' to proceed): " consent
 if [ "$consent" = "y" ]; then
     # NVM Installing and configuration
@@ -86,11 +91,17 @@ if [ "$consent" = "y" ]; then
     if [ "$consent_pm2" = "y" ]; then
         npm i -g pm2
     fi
+    echo ""
+    echo "=============================================== NVM, Node.js and NPM Finished =============================================="
+    echo ""
 else
     echo "Node.js Installation Aborted"
 fi
 
 # Installing and configuring Git
+echo ""
+echo "======================================= Git Installation ============================================"
+echo ""
 echo "Installing Git ..."
 sudo -S apt-get update
 sudo -S apt-get install -y git-all
@@ -114,8 +125,13 @@ echo ""
 cat ~/.ssh/id_ed25519.pub
 read -p "Press Enter key to continue ..."
 echo "If everything went right, you should be able to clone any repo from your GitHub account."
+echo ""
+echo "======================================= Git Installation Finished ============================================="
+echo ""
 
 # Installing and configuring Firewall
+echo "======================================= Firewall Installation ============================================"
+echo ""
 read -p "Do you want to install Firewall? Enter 'y' to continue: " consent_firewall
 echo ""
 if [ "$consent_firewall" = "y" ]; then
@@ -124,37 +140,42 @@ if [ "$consent_firewall" = "y" ]; then
     sudo -S apt install ufw -y
     sudo -S ufw default deny incoming
     sudo -S ufw default allow outgoing
+    sudo -S ufw enable
     echo "By Default, All incoming connections are denied and All outgoing connections are allowed."
     echo ""
-    read -p "Enter the names of the apps in the list and port numbers you want to allow through the firewall separated by spaces: " apps
+    read -p "Enter the names of the apps in the list and port numbers you want to allow through the firewall separated by comma: " apps
     echo ""
-    IFS=' '                    # Setting IFS (input field separator) value as " "
+    IFS=','                    # Setting IFS (input field separator) value as ","
     read -ra arr <<<"$apps"    # Reading the split string into an array
     for val in "${arr[@]}"; do # Iterating through the array elements
         sudo -S ufw allow "$val"
     done
+    sudo ufw reload
     echo "Current Firewall Status"
     sudo -S ufw status
     read -p "Press Enter key to continue ..."
-    echo "Firewall Installation completed..."
+    echo "============================================= Firewall Installation completed =============================================="
 else
     echo "Firewall installation aborted..."
 fi
 
 # Installing and configuring Jenkins
+echo ""
+echo "=================================== Jenkins Installation ====================================================="
+echo ""
 read -p "Do you want to install Jenkins CI/CD? Enter 'y' to continue: " consent_jenkins
 if [ "$consent_jenkins" = "y" ]; then
+    echo "Installing JAVA"
+    echo ""
+    sudo -S apt update
+    sudo -S apt install openjdk-17-jre -y
+    java -version
     echo "Installing Jenkins..."
     echo ""
     curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee /usr/share/keyrings/jenkins-keyring.asc >/dev/null
     echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/ | sudo tee /etc/apt/sources.list.d/jenkins.list >/dev/null
     sudo -S apt-get update
     sudo -S apt-get install -y jenkins
-    echo "Installing JAVA"
-    echo ""
-    sudo -S apt update
-    sudo -S apt install openjdk-17-jre -y
-    java -version
     echo "Configuring Jenkins..."
     echo ""
     sudo -S systemctl enable jenkins
@@ -165,30 +186,33 @@ if [ "$consent_jenkins" = "y" ]; then
     if [ -z "$port" ]; then
         port=8080
     fi
-    YOURPORT="$port"
-    PERM="--permanent"
-    SERV="$PERM --service=jenkins"
+    sudo -S ufw allow $port
+    sudo -S ufw reload
+    # YOURPORT=8080
+    # PERM="--permanent"
+    # SERV="$PERM --service=jenkins"
 
-    firewall-cmd $PERM --new-service=jenkins
-    firewall-cmd $SERV --set-short="Jenkins ports"
-    firewall-cmd $SERV --set-description="Jenkins port exceptions"
-    firewall-cmd $SERV --add-port=$YOURPORT/tcp
-    firewall-cmd $PERM --add-service=jenkins
-    firewall-cmd --zone=public --add-service=http --permanent
-    firewall-cmd --reload
-    echo "Jenkins Installation Finished"
+    # firewall-cmd $PERM --new-service=jenkins
+    # firewall-cmd $SERV --set-short="Jenkins ports"
+    # firewall-cmd $SERV --set-description="Jenkins port exceptions"
+    # firewall-cmd $SERV --add-port=$YOURPORT/tcp
+    # firewall-cmd $PERM --add-service=jenkins
+    # firewall-cmd --zone=public --add-service=http --permanent
+    # firewall-cmd --reload
+    echo "==================================== Jenkins Installation Finished ================================="
 else
     echo "Jenkins Installation Aborted"
 fi
 
 # Cleaning up the system
-echo "Cleaning up the system..."
+echo "======================================= Cleaning up the system ===================================="
 sudo -S apt update
 sudo -S apt-get update
 sudo -S apt upgrade -y
 sudo -S apt-get upgrade -y
 sudo -S apt autoremove -y
 sudo -S apt-get autoremove -y
+
 
 cat <<"EOF"
                              _____      __                 _______       _      __             __
