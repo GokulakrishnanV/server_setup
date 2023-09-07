@@ -34,6 +34,7 @@ if [ "$consent" = "y" ]; then
     echo ""
     echo "Modifying your hosts file..."
     echo "127.0.1.1 $domain_name $new_hostname" | sudo tee -a /etc/hosts
+    sudo systemctl restart systemd-hostnamed
     echo "Your hosts file has been changed successfully"
     echo ""
 else
@@ -61,9 +62,9 @@ if [ "$consent" = "y" ]; then
         git checkout $(git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --tags --max-count=1))
     ) && \. "$NVM_DIR/nvm.sh"
 
-    echo 'export NVM_DIR="$HOME/.nvm"' >> ~/.bashrc
-    echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> ~/.bashrc
-    echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"' >> ~/.bashrc
+    echo 'export NVM_DIR="$HOME/.nvm"' >>~/.bashrc
+    echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >>~/.bashrc
+    echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"' >>~/.bashrc
     echo ""
 
     # Installing Node.js and NPM
@@ -94,9 +95,9 @@ echo ""
 echo "Configuring Git ..."
 read -p "Enter your Github Username: " git_username
 read -p "Enter your Github email: " git_email
-echo "[user]" > ~/.gitconfig
-echo " name = $git_username" >> ~/.gitconfig
-echo "email = $git_email" >> ~/.gitconfig
+echo "[user]" >~/.gitconfig
+echo " name = $git_username" >>~/.gitconfig
+echo "email = $git_email" >>~/.gitconfig
 
 # Generating SSH key and adding it to the Github account
 echo "Configuring SSH with Github"
@@ -122,8 +123,8 @@ if [ "$consent_firewall" = "y" ]; then
     echo ""
     read -p "Enter the names of the apps in the list and port numbers you want to allow through the firewall separated by spaces: " apps
     echo ""
-    IFS=' ' # Setting IFS (input field separator) value as " "
-    read -ra arr <<< "$apps" # Reading the split string into an array
+    IFS=' '                    # Setting IFS (input field separator) value as " "
+    read -ra arr <<<"$apps"    # Reading the split string into an array
     for val in "${arr[@]}"; do # Iterating through the array elements
         sudo -S ufw allow "$val"
     done
