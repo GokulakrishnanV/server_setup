@@ -7,8 +7,7 @@ cat <<"EOF"
                                            ___/ /  __/ /_/ /_/ / /_/ /
                                           /____/\___/\__/\__,_/ .___/ 
                                                             /_/      
-EOF 
-
+EOF
 # Update the system
 echo "Running this script requires root privileges"
 echo ""
