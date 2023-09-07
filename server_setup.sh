@@ -1,4 +1,4 @@
-#!/bin/bash
+#! /bin/bash
 
 cat <<"EOF"
                                              _____      __            
@@ -187,7 +187,7 @@ sudo -S apt-get upgrade -y
 sudo -S apt autoremove -y
 sudo -S apt-get autoremove -y
 
-cat <<EOF
+cat << EOF
 
 
                              _____      __                 _______       _      __             __

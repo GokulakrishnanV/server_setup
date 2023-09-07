@@ -9,4 +9,4 @@ This script is witten by **Gokulakrishnan V** on 06-Sep-2023
 
 
 > Run the following
-    _ wget https://raw.githubusercontent.com/GokulakrishnanV/server_setup/main/server_setup.sh _
+    _wget https://raw.githubusercontent.com/GokulakrishnanV/server_setup/main/server_setup.sh_
