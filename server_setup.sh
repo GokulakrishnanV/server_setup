@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cat << "EOF"
+cat <<"EOF"
                                              _____      __            
                                             / ___/___  / /___  ______ 
                                             \__ \/ _ \/ __/ / / / __ \
@@ -12,7 +12,7 @@ EOF
 # Update the system
 echo "Running this script requires root privileges"
 echo ""
-read -sp "Enter your root password: " password
+read -p "Enter your root password: " password
 echo ""
 echo "Updating the system"
 echo ""
@@ -34,9 +34,7 @@ if [ "$consent" = "y" ]; then
     echo "Your current hostname is $(cat /etc/hostname)"
     echo ""
     echo "Modifying your hosts file..."
-    echo "127.0.1.1 $domain_name $new_hostname" | sudo tee /tmp/hosts.tmp
-    sudo cat /etc/hosts >> /tmp/hosts.tmp
-    sudo mv /tmp/hosts.tmp /etc/hosts
+    echo "127.0.1.1 $domain_name $new_hostname" | sudo tee -a /etc/hosts
     echo "Your hosts file has been changed successfully"
     echo ""
 else
