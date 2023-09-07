@@ -20,25 +20,30 @@ sudo -S apt-get dist-upgrade -y
 echo ""
 
 # Changing the Hostname and FQDN (Fully Qualified Domain Name)
-echo "Changing your hostname & Fully Qualified Domain Name"
-echo ""
-echo "Your current hostname is: $(hostname -f)"
-echo ""
-read -p "Do you want to change the hostname? Enter 'y' to continue: " consent
-if [ "$consent" = "y" ]; then
-    read -p "Enter your hostname (Eg: nutz): " new_hostname
-    read -p "Enter your domain name (Eg: nutz.in): " domain_name
-    echo "$new_hostname" | sudo tee /etc/hostname
-    echo "Your hostname has been modified successfully."
-    echo "Your current hostname is $(cat /etc/hostname)"
+if [ ! -f "script_state.txt" ]; then
+    step=1
+    echo "Changing your hostname & Fully Qualified Domain Name"
     echo ""
-    echo "Modifying your hosts file..."
-    echo "127.0.1.1 $domain_name $new_hostname" | sudo tee -a /etc/hosts
-    sudo systemctl restart systemd-hostnamed
-    echo "Your hosts file has been changed successfully"
+    echo "Your current hostname is: $(hostname -f)"
     echo ""
-else
-    echo "Hostname remains unchanged"
+    read -p "Do you want to change the hostname? Enter 'y' to continue: " consent
+    if [ "$consent" = "y" ]; then
+        read -p "Enter your hostname (Eg: nutz): " new_hostname
+        read -p "Enter your domain name (Eg: nutz.in): " domain_name
+        echo "$new_hostname" | sudo tee /etc/hostname
+        echo "Your hostname has been modified successfully."
+        echo "Your current hostname is $(cat /etc/hostname)"
+        echo ""
+        echo "Modifying your hosts file..."
+        echo "127.0.1.1 $domain_name $new_hostname" | sudo tee -a /etc/hosts
+        echo "Saving script state..."
+        echo "step=$step" >"script_state.txt"
+        sudo reboot
+        echo "Your hosts file has been changed successfully"
+        echo ""
+    else
+        echo "Hostname remains unchanged"
+    fi
 fi
 
 # Webmin & Virtualmin setup
