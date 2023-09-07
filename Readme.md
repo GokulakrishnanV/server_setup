@@ -12,7 +12,7 @@ This script is witten by **Gokulakrishnan V** on 06-Sep-2023
 > - Firewall
 > - Jenkins
 
-## About the script?
+## About the script
 
 This script is written for linux servers running Debian based derivatives.
 
@@ -31,17 +31,23 @@ This script runs best with freshly installed Operating System.
 
 If you want to view the contents of the file,
 
-`cat server_setup.sh`
+```
+cat server_setup.sh
+```
 
 Make the file executable
 
-`sudo chmod +x server_setup.sh`
+```
+sudo chmod +x server_setup.sh
+```
 
 **Step 3: Run the script in your terminal**
 
 Run the script by pasting the command in your terminal
 
-`./server_setup.sh`
+```
+./server_setup.sh
+```
 
 And Voila!. You have successfully used this script to setup 
 
