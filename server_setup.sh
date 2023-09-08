@@ -11,7 +11,7 @@ EOF
 # Update the system
 echo "Running this script requires root privileges"
 echo ""
-read -p "Enter your root password: " password
+read -rp "Enter your root password: " password
 echo ""
 echo "============================ Updating the system ============================"
 echo ""
@@ -28,10 +28,10 @@ if [ ! -f "script_state.txt" ]; then
     echo ""
     echo "Your current hostname is: $(hostname -f)"
     echo ""
-    read -p "Do you want to change the hostname? Enter 'y' to continue: " consent
+    read -rp "Do you want to change the hostname? Enter 'y' to continue: " consent
     if [ "$consent" = "y" ]; then
-        read -p "Enter your hostname (Eg: nutz): " new_hostname
-        read -p "Enter your domain name (Eg: nutz.in): " domain_name
+        read -rp "Enter your hostname (Eg: nutz): " new_hostname
+        read -rp "Enter your domain name (Eg: nutz.in): " domain_name
         echo "$new_hostname" | sudo tee /etc/hostname
         echo "Your hostname has been modified successfully."
         echo "Your current hostname is $(cat /etc/hostname)"
@@ -62,23 +62,27 @@ echo ""
 
 # Node & NPM Setup using NVM
 echo "========================================= NVM, Node.js and NPM Setup ==============================================="
-read -p "Do you want to install Node.js and NPM? We will use NVM to set these up (Enter 'y' to proceed): " consent
+read -rp "Do you want to install Node.js and NPM? We will use NVM to set these up (Enter 'y' to proceed): " consent
 if [ "$consent" = "y" ]; then
     # NVM Installing and configuration
     echo "Installing NVM ..."
     export NVM_DIR="$HOME/.nvm" && (
         git clone https://github.com/nvm-sh/nvm.git "$NVM_DIR"
         cd "$NVM_DIR"
-        git checkout $(git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --tags --max-count=1))
+        git checkout "$(git describe --abbrev=0 --tags --match 'v[0-9]*' "$(git rev-list --tags --max-count=1)")"
     ) && \. "$NVM_DIR/nvm.sh"
-
-    echo 'export NVM_DIR="$HOME/.nvm"' >>~/.bashrc
-    echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >>~/.bashrc
-    echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"' >>~/.bashrc
+    {
+        echo ""
+        echo "#NVM"
+        echo ""
+        echo "export NVM_DIR=\"$HOME/.nvm\""
+        echo "[ -s \"$NVM_DIR/nvm.sh\" ] && \. \"$NVM_DIR/nvm.sh\""
+        echo "[ -s \"$NVM_DIR/bash_completion\" ] && \. \"$NVM_DIR/bash_completion\""
+    } >>~/.bashrc
     echo ""
 
     # Installing Node.js and NPM
-    read -p "Enter the Node.js version to install (Eg: 14.17.0): " node_version
+    read -rp "Enter the Node.js version to install (Eg: 14.17.0): " node_version
     echo "Installing Node.js v$node_version"
     echo ""
     nvm install "$node_version"
@@ -87,7 +91,7 @@ if [ "$consent" = "y" ]; then
     nvm use "$node_version"
     echo "Current Node.js version is $(node -v)"
 
-    read -p "Do you want to install PM2? Enter 'y' to proceed: " consent_pm2
+    read -rp "Do you want to install PM2? Enter 'y' to proceed: " consent_pm2
     if [ "$consent_pm2" = "y" ]; then
         npm i -g pm2
     fi
@@ -109,8 +113,8 @@ echo "Your current Git version is $(git --version)"
 echo ""
 
 echo "Configuring Git ..."
-read -p "Enter your Github Username: " git_username
-read -p "Enter your Github email: " git_email
+read -rp "Enter your Github Username: " git_username
+read -rp "Enter your Github email: " git_email
 echo "[user]" >~/.gitconfig
 echo " name = $git_username" >>~/.gitconfig
 echo "email = $git_email" >>~/.gitconfig
@@ -123,7 +127,7 @@ ssh-add ~/.ssh/id_ed25519
 echo "Add the following SSH key to your GitHub account:"
 echo ""
 cat ~/.ssh/id_ed25519.pub
-read -p "Press Enter key to continue ..."
+read -rp "Press Enter key to continue ..."
 echo "If everything went right, you should be able to clone any repo from your GitHub account."
 echo ""
 echo "======================================= Git Installation Finished ============================================="
@@ -132,7 +136,7 @@ echo ""
 # Installing and configuring Firewall
 echo "======================================= Firewall Installation ============================================"
 echo ""
-read -p "Do you want to install Firewall? Enter 'y' to continue: " consent_firewall
+read -rp "Do you want to install Firewall? Enter 'y' to continue: " consent_firewall
 echo ""
 if [ "$consent_firewall" = "y" ]; then
     echo "Installing Firewall..."
@@ -143,7 +147,7 @@ if [ "$consent_firewall" = "y" ]; then
     sudo -S ufw enable
     echo "By Default, All incoming connections are denied and All outgoing connections are allowed."
     echo ""
-    read -p "Enter the names of the apps in the list and port numbers you want to allow through the firewall separated by comma: " apps
+    read -rp "Enter the names of the apps in the list and port numbers you want to allow through the firewall separated by comma: " apps
     echo ""
     IFS=','                    # Setting IFS (input field separator) value as ","
     read -ra arr <<<"$apps"    # Reading the split string into an array
@@ -153,7 +157,7 @@ if [ "$consent_firewall" = "y" ]; then
     sudo ufw reload
     echo "Current Firewall Status"
     sudo -S ufw status
-    read -p "Press Enter key to continue ..."
+    read -rp "Press Enter key to continue ..."
     echo "============================================= Firewall Installation completed =============================================="
 else
     echo "Firewall installation aborted..."
@@ -163,7 +167,7 @@ fi
 echo ""
 echo "=================================== Jenkins Installation ====================================================="
 echo ""
-read -p "Do you want to install Jenkins CI/CD? Enter 'y' to continue: " consent_jenkins
+read -rp "Do you want to install Jenkins CI/CD? Enter 'y' to continue: " consent_jenkins
 if [ "$consent_jenkins" = "y" ]; then
     echo "Installing JAVA"
     echo ""
@@ -173,8 +177,9 @@ if [ "$consent_jenkins" = "y" ]; then
     echo "Installing Jenkins..."
     echo ""
     curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee /usr/share/keyrings/jenkins-keyring.asc >/dev/null
-    echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/ | sudo tee /etc/apt/sources.list.d/jenkins.list >/dev/null
-    sudo -S apt-get update
+    echo deb [ signed-by=/usr/share/keyrings/jenkins-keyring.asc ] \
+        https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+        /etc/apt/sources.list.d/jenkins.list sudo -S apt-get update >/dev/null
     sudo -S apt-get install -y jenkins
     echo "Configuring Jenkins..."
     echo ""
@@ -182,11 +187,11 @@ if [ "$consent_jenkins" = "y" ]; then
     sudo -S systemctl start jenkins
     echo "Status of Jenkins Service"
     sudo -S systemctl status jenkins
-    read -p "Enter the port to run Jenkins. Default is port 8080: " port
+    read -rp "Enter the port to run Jenkins. Default is port 8080: " port
     if [ -z "$port" ]; then
         port=8080
     fi
-    sudo -S ufw allow $port
+    sudo -S ufw allow "$port"
     sudo -S ufw reload
     # YOURPORT=8080
     # PERM="--permanent"
@@ -204,6 +209,17 @@ else
     echo "Jenkins Installation Aborted"
 fi
 
+#echo ""
+#echo "======================================= Jitsi Meet ===================================="
+#echo ""
+#read -rp "Do you want to install Jitsi meet? Enter 'y' to continue: " consent
+#if [ $consent -eq 'y' ]; then
+#echo "Installing Jitsi..."
+#else
+#echo "Jitsi Installation Aborted..."
+#echo ""
+#fi
+
 # Cleaning up the system
 echo "======================================= Cleaning up the system ===================================="
 sudo -S apt update
@@ -212,7 +228,6 @@ sudo -S apt upgrade -y
 sudo -S apt-get upgrade -y
 sudo -S apt autoremove -y
 sudo -S apt-get autoremove -y
-
 
 cat <<"EOF"
                              _____      __                 _______       _      __             __
