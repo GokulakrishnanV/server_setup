@@ -55,6 +55,8 @@ echo "Downloading Virtualmin ..."
 wget https://software.virtualmin.com/gpl/scripts/install.sh
 echo "Installing Virtualmin ..."
 echo "y" | sudo /bin/sh ./install.sh
+sudo /usr/share/webmin/changepass.pl /etc/webmin root admin
+echo "default password admin"
 # echo "Virtualmin setup complete. Go to 'https://$domain_name:10000' to complete the post-installation wizard"
 echo ""
 echo "========================================== Virutlamin Setup Completed ==============================================="
